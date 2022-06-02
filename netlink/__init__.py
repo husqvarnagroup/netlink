@@ -5,7 +5,7 @@ import logging
 import os
 import socket
 import struct
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from netlink import attributes
 
@@ -115,9 +115,9 @@ class NetlinkSocket:
         self.loop = loop
 
         self.sequence = itertools.count(1)
-        self.pending: Dict[str, asyncio.Event] = {}
-        self.replies: Dict[str, NetlinkMessage] = {}
-        self.packets: Dict[str, NetlinkMessage] = {}
+        self.pending: Dict[int, asyncio.Event] = {}
+        self.replies: Dict[int, NetlinkMessage] = {}
+        self.packets: Dict[int, List[NetlinkMessage]] = {}
 
         self.package_queue: asyncio.Queue[NetlinkMessage] = asyncio.Queue(queue_size)
 
@@ -163,7 +163,7 @@ class NetlinkSocket:
     async def receive(self):
         return await self.package_queue.get()
 
-    async def request(self, type, payload=b"", flags=0, timeout=3):
+    async def request(self, type, payload=b"", flags=0, timeout=3) -> List[NetlinkMessage]:
         event = asyncio.Event()
 
         sequence = next(self.sequence)

@@ -146,7 +146,7 @@ class NetlinkSocket:
                         self.pending.pop(sequence).set()
                     else:
                         logger.warning("Received unexpected ack or error packet")
-                elif sequence == 0:
+                if sequence == 0:
                     await self.package_queue.put(message)
                 elif sequence in self.packets:
                     self.packets[sequence].append(message)

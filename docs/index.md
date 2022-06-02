@@ -1,7 +1,7 @@
 
 ## Welcome to python-netlink
 
-This package provides an asynchronous [netlink](https://man7.org/linux/man-pages/man7/netlink.7.html) implementation based on [trio](https://github.com/python-trio/trio).
+This package provides an asynchronous [netlink](https://man7.org/linux/man-pages/man7/netlink.7.html) implementation.
 
 * [Features](#features)
 * [Contributing](#contributing)

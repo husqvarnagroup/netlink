@@ -1,10 +1,8 @@
-
-from netlink import attributes
-import netlink
-
 import contextlib
 import struct
 
+import netlink
+from netlink import attributes
 
 RTM_NEWADDR = 20
 RTM_NEWNEIGH = 28
@@ -87,65 +85,65 @@ RT_SCOPE_NOWHERE = 255
 
 
 ATTRIBUTES_IFA = {
-	IFA_ADDRESS: attributes.binary(),
-	IFA_LOCAL: attributes.binary(),
-	IFA_LABEL: attributes.string(),
-	IFA_BROADCAST: attributes.binary(),
-	IFA_ANYCAST: attributes.binary(),
-	IFA_CACHEINFO: attributes.binary(),
-	IFA_MULTICAST: attributes.binary(),
-	IFA_FLAGS: attributes.u32(),
-	IFA_RT_PRIORITY: attributes.u32(),
-	IFA_TARGET_NETNSID: attributes.s32()
+    IFA_ADDRESS: attributes.binary(),
+    IFA_LOCAL: attributes.binary(),
+    IFA_LABEL: attributes.string(),
+    IFA_BROADCAST: attributes.binary(),
+    IFA_ANYCAST: attributes.binary(),
+    IFA_CACHEINFO: attributes.binary(),
+    IFA_MULTICAST: attributes.binary(),
+    IFA_FLAGS: attributes.u32(),
+    IFA_RT_PRIORITY: attributes.u32(),
+    IFA_TARGET_NETNSID: attributes.s32(),
 }
 
 ATTRIBUTES_NFEA = {
-	NFEA_ACTIVITY_NOTIFY: attributes.u8(),
-	NFEA_DONT_REFRESH: attributes.flag()
+    NFEA_ACTIVITY_NOTIFY: attributes.u8(),
+    NFEA_DONT_REFRESH: attributes.flag(),
 }
 
 ATTRIBUTES_NDA = {
-	NDA_DST: attributes.binary(),
-	NDA_LLADDR: attributes.binary(),
-	NDA_CACHEINFO: attributes.binary(),
-	NDA_PROBES: attributes.u32(),
-	NDA_VLAN: attributes.u16(),
-	NDA_PORT: attributes.u16(),
-	NDA_VNI: attributes.u32(),
-	NDA_IFINDEX: attributes.u32(),
-	NDA_MASTER: attributes.u32(),
-	NDA_LINK_NETNSID: attributes.s32(),
-	NDA_SRC_VNI: attributes.u32(),
-	NDA_PROTOCOL: attributes.u8(),
-	NDA_NH_ID: attributes.u32(),
-	NDA_FDB_EXT_ATTRS: attributes.nested(ATTRIBUTES_NFEA),
-	NDA_FLAGS_EXT: attributes.u32()
+    NDA_DST: attributes.binary(),
+    NDA_LLADDR: attributes.binary(),
+    NDA_CACHEINFO: attributes.binary(),
+    NDA_PROBES: attributes.u32(),
+    NDA_VLAN: attributes.u16(),
+    NDA_PORT: attributes.u16(),
+    NDA_VNI: attributes.u32(),
+    NDA_IFINDEX: attributes.u32(),
+    NDA_MASTER: attributes.u32(),
+    NDA_LINK_NETNSID: attributes.s32(),
+    NDA_SRC_VNI: attributes.u32(),
+    NDA_PROTOCOL: attributes.u8(),
+    NDA_NH_ID: attributes.u32(),
+    NDA_FDB_EXT_ATTRS: attributes.nested(ATTRIBUTES_NFEA),
+    NDA_FLAGS_EXT: attributes.u32(),
 }
 
 
 class RouteController:
-	def __init__(self, netlink):
-		self.netlink = netlink
-	
-	async def add_address(self, family, prefix, flags, scope, index, attrs):
-		payload = struct.pack("BBBBI", family, prefix, flags, scope, index)
-		payload += attributes.encode(attrs, ATTRIBUTES_IFA)
-		flags = netlink.NLM_F_CREATE | netlink.NLM_F_EXCL
-		await self.netlink.request(RTM_NEWADDR, payload, flags)
-	
-	async def add_neighbor(self, family, index, state, flags, type, attrs):
-		payload = struct.pack("B3xiHBB", family, index, state, flags, type)
-		payload += attributes.encode(attrs, ATTRIBUTES_NDA)
-		flags = netlink.NLM_F_CREATE | netlink.NLM_F_EXCL
-		await self.netlink.request(RTM_NEWNEIGH, payload, flags)
-	
-	async def remove_neighbor(self, family, index, state, flags, type, attrs):
-		payload = struct.pack("B3xiHBB", family, index, state, flags, type)
-		payload += attributes.encode(attrs, ATTRIBUTES_NDA)
-		await self.netlink.request(RTM_DELNEIGH, payload, 0)
+    def __init__(self, netlink):
+        self.netlink = netlink
+
+    async def add_address(self, family, prefix, flags, scope, index, attrs):
+        payload = struct.pack("BBBBI", family, prefix, flags, scope, index)
+        payload += attributes.encode(attrs, ATTRIBUTES_IFA)
+        flags = netlink.NLM_F_CREATE | netlink.NLM_F_EXCL
+        await self.netlink.request(RTM_NEWADDR, payload, flags)
+
+    async def add_neighbor(self, family, index, state, flags, type, attrs):
+        payload = struct.pack("B3xiHBB", family, index, state, flags, type)
+        payload += attributes.encode(attrs, ATTRIBUTES_NDA)
+        flags = netlink.NLM_F_CREATE | netlink.NLM_F_EXCL
+        await self.netlink.request(RTM_NEWNEIGH, payload, flags)
+
+    async def remove_neighbor(self, family, index, state, flags, type, attrs):
+        payload = struct.pack("B3xiHBB", family, index, state, flags, type)
+        payload += attributes.encode(attrs, ATTRIBUTES_NDA)
+        await self.netlink.request(RTM_DELNEIGH, payload, 0)
 
 
 @contextlib.asynccontextmanager
 async def connect():
-	async with netlink.connect(netlink.NETLINK_ROUTE) as sock:
-		yield RouteController(sock)
+    async with netlink.connect(netlink.NETLINK_ROUTE) as sock:
+        yield RouteController(sock)

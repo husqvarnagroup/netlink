@@ -4,3 +4,10 @@ __pycache__/
 /build/
 /dist/
 /python_netlink.egg-info/
+
+/env/
+/venv/
+/.venv/
+
+/.vscode/
+.envrc

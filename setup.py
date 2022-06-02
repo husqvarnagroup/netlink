@@ -19,5 +19,4 @@ setuptools.setup(
 	license = "GPLv3",
 	platforms = ["Linux"],
 	packages = ["netlink"],
-	install_requires = ["trio"]
 )

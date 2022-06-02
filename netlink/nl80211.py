@@ -1,6 +1,7 @@
-
-from netlink import generic, attributes
 import contextlib
+from typing import Dict
+
+from netlink import attributes, generic
 
 NL80211_CMD_UNSPEC = 0
 NL80211_CMD_GET_WIPHY = 1
@@ -784,593 +785,573 @@ NL80211_PROBE_RESP_OFFLOAD_SUPPORT_80211U = 1 << 3
 
 
 class NL80211(generic.GenericNetlinkSocket):
-	ATTRIBUTES = {} # Forward declaration
+    ATTRIBUTES: Dict[int, attributes.AttributeType] = {}  # Forward declaration
 
-	ATTRIBUTES_CQM = {
-		NL80211_ATTR_CQM_RSSI_THOLD: attributes.binary(),
-		NL80211_ATTR_CQM_RSSI_HYST: attributes.u32(),
-		NL80211_ATTR_CQM_RSSI_THRESHOLD_EVENT: attributes.u32(),
-		NL80211_ATTR_CQM_PKT_LOSS_EVENT: attributes.u32(),
-		NL80211_ATTR_CQM_TXE_RATE: attributes.u32(),
-		NL80211_ATTR_CQM_TXE_PKTS: attributes.u32(),
-		NL80211_ATTR_CQM_TXE_INTVL: attributes.u32(),
-		NL80211_ATTR_CQM_BEACON_LOSS_EVENT: attributes.flag(),
-		NL80211_ATTR_CQM_RSSI_LEVEL: attributes.s32()
-	}
+    ATTRIBUTES_CQM = {
+        NL80211_ATTR_CQM_RSSI_THOLD: attributes.binary(),
+        NL80211_ATTR_CQM_RSSI_HYST: attributes.u32(),
+        NL80211_ATTR_CQM_RSSI_THRESHOLD_EVENT: attributes.u32(),
+        NL80211_ATTR_CQM_PKT_LOSS_EVENT: attributes.u32(),
+        NL80211_ATTR_CQM_TXE_RATE: attributes.u32(),
+        NL80211_ATTR_CQM_TXE_PKTS: attributes.u32(),
+        NL80211_ATTR_CQM_TXE_INTVL: attributes.u32(),
+        NL80211_ATTR_CQM_BEACON_LOSS_EVENT: attributes.flag(),
+        NL80211_ATTR_CQM_RSSI_LEVEL: attributes.s32(),
+    }
 
-	ATTRIBUTES_WMMR = {
-		NL80211_WMMR_CW_MIN: attributes.u16(),
-		NL80211_WMMR_CW_MAX: attributes.u16(),
-		NL80211_WMMR_AIFSN: attributes.u8(),
-		NL80211_WMMR_TXOP: attributes.u16()
-	}
+    ATTRIBUTES_WMMR = {
+        NL80211_WMMR_CW_MIN: attributes.u16(),
+        NL80211_WMMR_CW_MAX: attributes.u16(),
+        NL80211_WMMR_AIFSN: attributes.u8(),
+        NL80211_WMMR_TXOP: attributes.u16(),
+    }
 
-	ATTRIBUTES_FREQUENCY = {
-		NL80211_FREQUENCY_ATTR_FREQ: attributes.u32(),
-		NL80211_FREQUENCY_ATTR_DISABLED: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_NO_IR: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_NO_IBSS: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_RADAR: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_MAX_TX_POWER: attributes.u32(),
-		NL80211_FREQUENCY_ATTR_DFS_STATE: attributes.u32(),
-		NL80211_FREQUENCY_ATTR_DFS_TIME: attributes.u32(),
-		NL80211_FREQUENCY_ATTR_NO_HT40_MINUS: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_NO_HT40_PLUS: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_NO_80MHZ: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_NO_160MHZ: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_DFS_CAC_TIME: attributes.u32(),
-		NL80211_FREQUENCY_ATTR_INDOOR_ONLY: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_IR_CONCURRENT: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_NO_20MHZ: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_NO_10MHZ: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_WMM: attributes.array(attributes.nested(ATTRIBUTES_WMMR)),
-		NL80211_FREQUENCY_ATTR_NO_HE: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_OFFSET: attributes.u32(),
-		NL80211_FREQUENCY_ATTR_1MHZ: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_2MHZ: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_4MHZ: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_8MHZ: attributes.flag(),
-		NL80211_FREQUENCY_ATTR_16MHZ: attributes.flag()
-	}
+    ATTRIBUTES_FREQUENCY = {
+        NL80211_FREQUENCY_ATTR_FREQ: attributes.u32(),
+        NL80211_FREQUENCY_ATTR_DISABLED: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_NO_IR: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_NO_IBSS: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_RADAR: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_MAX_TX_POWER: attributes.u32(),
+        NL80211_FREQUENCY_ATTR_DFS_STATE: attributes.u32(),
+        NL80211_FREQUENCY_ATTR_DFS_TIME: attributes.u32(),
+        NL80211_FREQUENCY_ATTR_NO_HT40_MINUS: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_NO_HT40_PLUS: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_NO_80MHZ: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_NO_160MHZ: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_DFS_CAC_TIME: attributes.u32(),
+        NL80211_FREQUENCY_ATTR_INDOOR_ONLY: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_IR_CONCURRENT: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_NO_20MHZ: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_NO_10MHZ: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_WMM: attributes.array(
+            attributes.nested(ATTRIBUTES_WMMR)
+        ),
+        NL80211_FREQUENCY_ATTR_NO_HE: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_OFFSET: attributes.u32(),
+        NL80211_FREQUENCY_ATTR_1MHZ: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_2MHZ: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_4MHZ: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_8MHZ: attributes.flag(),
+        NL80211_FREQUENCY_ATTR_16MHZ: attributes.flag(),
+    }
 
-	ATTRIBUTES_BITRATE = {
-		NL80211_BITRATE_ATTR_RATE: attributes.u32(),
-		NL80211_BITRATE_ATTR_2GHZ_SHORTPREAMBLE: attributes.flag()
-	}
-	
-	ATTRIBUTES_BAND_IFTYPE = {
-		NL80211_BAND_IFTYPE_ATTR_IFTYPES: attributes.array(attributes.flag()),
-		NL80211_BAND_IFTYPE_ATTR_HE_CAP_MAC: attributes.binary(),
-		NL80211_BAND_IFTYPE_ATTR_HE_CAP_PHY: attributes.binary(),
-		NL80211_BAND_IFTYPE_ATTR_HE_CAP_MCS_SET: attributes.binary(),
-		NL80211_BAND_IFTYPE_ATTR_HE_CAP_PPE: attributes.binary(),
-		NL80211_BAND_IFTYPE_ATTR_HE_6GHZ_CAPA: attributes.binary(),
-		NL80211_BAND_IFTYPE_ATTR_VENDOR_ELEMS: attributes.binary()
-	}
+    ATTRIBUTES_BITRATE = {
+        NL80211_BITRATE_ATTR_RATE: attributes.u32(),
+        NL80211_BITRATE_ATTR_2GHZ_SHORTPREAMBLE: attributes.flag(),
+    }
 
-	ATTRIBUTES_BAND = {
-		NL80211_BAND_ATTR_FREQS: attributes.array(attributes.nested(ATTRIBUTES_FREQUENCY)),
-		NL80211_BAND_ATTR_RATES: attributes.array(attributes.nested(ATTRIBUTES_BITRATE)),
-		NL80211_BAND_ATTR_HT_MCS_SET: attributes.binary(),
-		NL80211_BAND_ATTR_HT_CAPA: attributes.u16(),
-		NL80211_BAND_ATTR_HT_AMPDU_FACTOR: attributes.u8(),
-		NL80211_BAND_ATTR_HT_AMPDU_DENSITY: attributes.u8(),
-		NL80211_BAND_ATTR_VHT_MCS_SET: attributes.binary(),
-		NL80211_BAND_ATTR_VHT_CAPA: attributes.u32(),
-		NL80211_BAND_ATTR_IFTYPE_DATA: attributes.array(attributes.nested(ATTRIBUTES_BAND_IFTYPE), base=1),
-		NL80211_BAND_ATTR_EDMG_CHANNELS: attributes.u8(),
-		NL80211_BAND_ATTR_EDMG_BW_CONFIG: attributes.u8()
-	}
-	
-	ATTRIBUTES_PKTPAT = {
-		NL80211_PKTPAT_MASK: attributes.binary(),
-		NL80211_PKTPAT_PATTERN: attributes.binary(),
-		NL80211_PKTPAT_OFFSET: attributes.u32()
-	}
-	
-	ATTRIBUTES_WOWLAN_TCP = {
-		NL80211_WOWLAN_TCP_SRC_IPV4: attributes.u32(),
-		NL80211_WOWLAN_TCP_DST_IPV4: attributes.u32(),
-		NL80211_WOWLAN_TCP_DST_MAC: attributes.binary(),
-		NL80211_WOWLAN_TCP_SRC_PORT: attributes.u16(),
-		NL80211_WOWLAN_TCP_DST_PORT: attributes.u16(),
-		NL80211_WOWLAN_TCP_DATA_PAYLOAD: attributes.binary(),
-		NL80211_WOWLAN_TCP_DATA_PAYLOAD_SEQ: attributes.binary(),
-		NL80211_WOWLAN_TCP_DATA_PAYLOAD_TOKEN: attributes.binary(),
-		NL80211_WOWLAN_TCP_DATA_INTERVAL: attributes.u32(),
-		NL80211_WOWLAN_TCP_WAKE_PAYLOAD: attributes.binary(),
-		NL80211_WOWLAN_TCP_WAKE_MASK: attributes.binary()
-	}
+    ATTRIBUTES_BAND_IFTYPE = {
+        NL80211_BAND_IFTYPE_ATTR_IFTYPES: attributes.array(attributes.flag()),
+        NL80211_BAND_IFTYPE_ATTR_HE_CAP_MAC: attributes.binary(),
+        NL80211_BAND_IFTYPE_ATTR_HE_CAP_PHY: attributes.binary(),
+        NL80211_BAND_IFTYPE_ATTR_HE_CAP_MCS_SET: attributes.binary(),
+        NL80211_BAND_IFTYPE_ATTR_HE_CAP_PPE: attributes.binary(),
+        NL80211_BAND_IFTYPE_ATTR_HE_6GHZ_CAPA: attributes.binary(),
+        NL80211_BAND_IFTYPE_ATTR_VENDOR_ELEMS: attributes.binary(),
+    }
 
-	ATTRIBUTES_WOWLAN_TRIG = {
-		NL80211_WOWLAN_TRIG_ANY: attributes.flag(),
-		NL80211_WOWLAN_TRIG_DISCONNECT: attributes.flag(),
-		NL80211_WOWLAN_TRIG_MAGIC_PKT: attributes.flag(),
-		NL80211_WOWLAN_TRIG_PKT_PATTERN: attributes.binary(), # Depends on command
-		NL80211_WOWLAN_TRIG_GTK_REKEY_SUPPORTED: attributes.flag(),
-		NL80211_WOWLAN_TRIG_GTK_REKEY_FAILURE: attributes.flag(),
-		NL80211_WOWLAN_TRIG_EAP_IDENT_REQUEST: attributes.flag(),
-		NL80211_WOWLAN_TRIG_4WAY_HANDSHAKE: attributes.flag(),
-		NL80211_WOWLAN_TRIG_RFKILL_RELEASE: attributes.flag(),
-		NL80211_WOWLAN_TRIG_WAKEUP_PKT_80211: attributes.binary(),
-		NL80211_WOWLAN_TRIG_WAKEUP_PKT_80211_LEN: attributes.u32(),
-		NL80211_WOWLAN_TRIG_WAKEUP_PKT_8023: attributes.binary(),
-		NL80211_WOWLAN_TRIG_WAKEUP_PKT_8023_LEN: attributes.u32(),
-		NL80211_WOWLAN_TRIG_TCP_CONNECTION: attributes.nested(ATTRIBUTES_WOWLAN_TCP),
-		NL80211_WOWLAN_TRIG_WAKEUP_TCP_MATCH: attributes.flag(),
-		NL80211_WOWLAN_TRIG_WAKEUP_TCP_CONNLOST: attributes.flag(),
-		NL80211_WOWLAN_TRIG_WAKEUP_TCP_NOMORETOKENS: attributes.flag(),
-		NL80211_WOWLAN_TRIG_NET_DETECT: attributes.nested(ATTRIBUTES),
-		NL80211_WOWLAN_TRIG_NET_DETECT_RESULTS: attributes.array(attributes.nested(ATTRIBUTES))
-	}
-	
-	ATTRIBUTES_WOWLAN_TRIG_SUPPORTED = ATTRIBUTES_WOWLAN_TRIG.copy()
-	ATTRIBUTES_WOWLAN_TRIG_SUPPORTED.update({
-		NL80211_WOWLAN_TRIG_NET_DETECT: attributes.u32()
-	})
-	
-	ATTRIBUTES_IFACE_LIMIT = {
-		NL80211_IFACE_LIMIT_MAX: attributes.u32(),
-		NL80211_IFACE_LIMIT_TYPES: attributes.array(attributes.flag())
-	}
+    ATTRIBUTES_BAND = {
+        NL80211_BAND_ATTR_FREQS: attributes.array(
+            attributes.nested(ATTRIBUTES_FREQUENCY)
+        ),
+        NL80211_BAND_ATTR_RATES: attributes.array(
+            attributes.nested(ATTRIBUTES_BITRATE)
+        ),
+        NL80211_BAND_ATTR_HT_MCS_SET: attributes.binary(),
+        NL80211_BAND_ATTR_HT_CAPA: attributes.u16(),
+        NL80211_BAND_ATTR_HT_AMPDU_FACTOR: attributes.u8(),
+        NL80211_BAND_ATTR_HT_AMPDU_DENSITY: attributes.u8(),
+        NL80211_BAND_ATTR_VHT_MCS_SET: attributes.binary(),
+        NL80211_BAND_ATTR_VHT_CAPA: attributes.u32(),
+        NL80211_BAND_ATTR_IFTYPE_DATA: attributes.array(
+            attributes.nested(ATTRIBUTES_BAND_IFTYPE), base=1
+        ),
+        NL80211_BAND_ATTR_EDMG_CHANNELS: attributes.u8(),
+        NL80211_BAND_ATTR_EDMG_BW_CONFIG: attributes.u8(),
+    }
 
-	ATTRIBUTES_IFACE_COMB = {
-		NL80211_IFACE_COMB_LIMITS: attributes.array(attributes.nested(ATTRIBUTES_IFACE_LIMIT), base=1),
-		NL80211_IFACE_COMB_MAXNUM: attributes.u32(),
-		NL80211_IFACE_COMB_STA_AP_BI_MATCH: attributes.flag(),
-		NL80211_IFACE_COMB_NUM_CHANNELS: attributes.u32(),
-		NL80211_IFACE_COMB_RADAR_DETECT_WIDTHS: attributes.u32(),
-		NL80211_IFACE_COMB_RADAR_DETECT_REGIONS: attributes.u32(),
-		NL80211_IFACE_COMB_BI_MIN_GCD: attributes.u32()
-	}
-	
-	ATTRIBUTES_RATE_INFO = {
-		NL80211_RATE_INFO_BITRATE: attributes.u16(),
-		NL80211_RATE_INFO_MCS: attributes.u8(),
-		NL80211_RATE_INFO_40_MHZ_WIDTH: attributes.flag(),
-		NL80211_RATE_INFO_SHORT_GI: attributes.flag(),
-		NL80211_RATE_INFO_BITRATE32: attributes.u32(),
-		NL80211_RATE_INFO_VHT_MCS: attributes.u8(),
-		NL80211_RATE_INFO_VHT_NSS: attributes.u8(),
-		NL80211_RATE_INFO_80_MHZ_WIDTH: attributes.flag(),
-		NL80211_RATE_INFO_80P80_MHZ_WIDTH: attributes.flag(),
-		NL80211_RATE_INFO_160_MHZ_WIDTH: attributes.flag(),
-		NL80211_RATE_INFO_10_MHZ_WIDTH: attributes.flag(),
-		NL80211_RATE_INFO_5_MHZ_WIDTH: attributes.flag(),
-		NL80211_RATE_INFO_HE_MCS: attributes.u8(),
-		NL80211_RATE_INFO_HE_NSS: attributes.u8(),
-		NL80211_RATE_INFO_HE_GI: attributes.u8(),
-		NL80211_RATE_INFO_HE_DCM: attributes.u8(),
-		NL80211_RATE_INFO_HE_RU_ALLOC: attributes.u8()
-	}
-	
-	ATTRIBUTES_TXQ_STATS = {
-		NL80211_TXQ_STATS_BACKLOG_BYTES: attributes.u32(),
-		NL80211_TXQ_STATS_BACKLOG_PACKETS: attributes.u32(),
-		NL80211_TXQ_STATS_FLOWS: attributes.u32(),
-		NL80211_TXQ_STATS_DROPS: attributes.u32(),
-		NL80211_TXQ_STATS_ECN_MARKS: attributes.u32(),
-		NL80211_TXQ_STATS_OVERLIMIT: attributes.u32(),
-		NL80211_TXQ_STATS_OVERMEMORY: attributes.u32(),
-		NL80211_TXQ_STATS_COLLISIONS: attributes.u32(),
-		NL80211_TXQ_STATS_TX_BYTES: attributes.u32(),
-		NL80211_TXQ_STATS_TX_PACKETS: attributes.u32(),
-		NL80211_TXQ_STATS_MAX_FLOWS: attributes.u32()
-	}
-	
-	ATTRIBUTES_TID_STATS = {
-		NL80211_TID_STATS_RX_MSDU: attributes.u64(),
-		NL80211_TID_STATS_TX_MSDU: attributes.u64(),
-		NL80211_TID_STATS_TX_MSDU_RETRIES: attributes.u64(),
-		NL80211_TID_STATS_TX_MSDU_FAILED: attributes.u64(),
-		NL80211_TID_STATS_PAD: attributes.padding(),
-		NL80211_TID_STATS_TXQ_STATS: attributes.nested(ATTRIBUTES_TXQ_STATS)
-	}
-	
-	ATTRIBUTES_STA_BSS_PARAM = {
-		NL80211_STA_BSS_PARAM_CTS_PROT: attributes.flag(),
-		NL80211_STA_BSS_PARAM_SHORT_PREAMBLE: attributes.flag(),
-		NL80211_STA_BSS_PARAM_SHORT_SLOT_TIME: attributes.flag(),
-		NL80211_STA_BSS_PARAM_DTIM_PERIOD: attributes.u8(),
-		NL80211_STA_BSS_PARAM_BEACON_INTERVAL: attributes.u16()
-	}
-	
-	ATTRIBUTES_STA_FLAG = {
-		NL80211_STA_FLAG_AUTHORIZED: attributes.flag(),
-		NL80211_STA_FLAG_SHORT_PREAMBLE: attributes.flag(),
-		NL80211_STA_FLAG_WME: attributes.flag(),
-		NL80211_STA_FLAG_MFP: attributes.flag(),
-		NL80211_STA_FLAG_AUTHENTICATED: attributes.flag(),
-		NL80211_STA_FLAG_TDLS_PEER: attributes.flag(),
-		NL80211_STA_FLAG_ASSOCIATED: attributes.flag()
-	}
-	
-	ATTRIBUTES_STA_INFO = {
-		NL80211_STA_INFO_INACTIVE_TIME: attributes.u32(),
-		NL80211_STA_INFO_RX_BYTES: attributes.u32(),
-		NL80211_STA_INFO_TX_BYTES: attributes.u32(),
-		NL80211_STA_INFO_LLID: attributes.u16(),
-		NL80211_STA_INFO_PLID: attributes.u16(),
-		NL80211_STA_INFO_PLINK_STATE: attributes.u8(),
-		NL80211_STA_INFO_SIGNAL: attributes.u8(),
-		NL80211_STA_INFO_TX_BITRATE: attributes.nested(ATTRIBUTES_RATE_INFO),
-		NL80211_STA_INFO_RX_PACKETS: attributes.u32(),
-		NL80211_STA_INFO_TX_PACKETS: attributes.u32(),
-		NL80211_STA_INFO_TX_RETRIES: attributes.u32(),
-		NL80211_STA_INFO_TX_FAILED: attributes.u32(),
-		NL80211_STA_INFO_SIGNAL_AVG: attributes.u8(),
-		NL80211_STA_INFO_RX_BITRATE: attributes.nested(ATTRIBUTES_RATE_INFO),
-		NL80211_STA_INFO_BSS_PARAM: attributes.nested(ATTRIBUTES_STA_BSS_PARAM),
-		NL80211_STA_INFO_CONNECTED_TIME: attributes.u32(),
-		NL80211_STA_INFO_STA_FLAGS: attributes.binary(),
-		NL80211_STA_INFO_BEACON_LOSS: attributes.u32(),
-		NL80211_STA_INFO_T_OFFSET: attributes.u64(),
-		NL80211_STA_INFO_LOCAL_PM: attributes.u32(),
-		NL80211_STA_INFO_PEER_PM: attributes.u32(),
-		NL80211_STA_INFO_NONPEER_PM: attributes.u32(),
-		NL80211_STA_INFO_RX_BYTES64: attributes.u64(),
-		NL80211_STA_INFO_TX_BYTES64: attributes.u64(),
-		NL80211_STA_INFO_CHAIN_SIGNAL: attributes.array(attributes.u8()),
-		NL80211_STA_INFO_CHAIN_SIGNAL_AVG: attributes.array(attributes.u8()),
-		NL80211_STA_INFO_EXPECTED_THROUGHPUT: attributes.u32(),
-		NL80211_STA_INFO_RX_DROP_MISC: attributes.u64(),
-		NL80211_STA_INFO_BEACON_RX: attributes.u64(),
-		NL80211_STA_INFO_BEACON_SIGNAL_AVG: attributes.u8(),
-		NL80211_STA_INFO_TID_STATS: attributes.array(attributes.nested(ATTRIBUTES_TID_STATS), base=1),
-		NL80211_STA_INFO_RX_DURATION: attributes.u64(),
-		NL80211_STA_INFO_PAD: attributes.padding(),
-		NL80211_STA_INFO_ACK_SIGNAL:attributes.u8(),
-		NL80211_STA_INFO_ACK_SIGNAL_AVG: attributes.s8(),
-		NL80211_STA_INFO_RX_MPDUS: attributes.u32(),
-		NL80211_STA_INFO_FCS_ERROR_COUNT: attributes.u32(),
-		NL80211_STA_INFO_CONNECTED_TO_GATE: attributes.u8(),
-		NL80211_STA_INFO_TX_DURATION: attributes.u64(),
-		NL80211_STA_INFO_AIRTIME_WEIGHT: attributes.u16(),
-		NL80211_STA_INFO_AIRTIME_LINK_METRIC: attributes.u32(),
-		NL80211_STA_INFO_ASSOC_AT_BOOTTIME: attributes.u64(),
-		NL80211_STA_INFO_CONNECTED_TO_AS: attributes.u8()
-	}
-	
-	ATTRIBUTES_STA_WME = {
-		NL80211_STA_WME_UAPSD_QUEUES: attributes.u8(),
-		NL80211_STA_WME_MAX_SP: attributes.u8()
-	}
-	
-	ATTRIBUTES_MPATH_INFO = {
-		NL80211_MPATH_INFO_FRAME_QLEN: attributes.u32(),
-		NL80211_MPATH_INFO_SN: attributes.u32(),
-		NL80211_MPATH_INFO_METRIC: attributes.u32(),
-		NL80211_MPATH_INFO_EXPTIME: attributes.u32(),
-		NL80211_MPATH_INFO_FLAGS: attributes.u8(),
-		NL80211_MPATH_INFO_DISCOVERY_TIMEOUT: attributes.u32(),
-		NL80211_MPATH_INFO_DISCOVERY_RETRIES: attributes.u8(),
-		NL80211_MPATH_INFO_HOP_COUNT: attributes.u8(),
-		NL80211_MPATH_INFO_PATH_CHANGE: attributes.u32()
-	}
-	
-	ATTRIBUTES_REG_RULE = {
-		NL80211_ATTR_REG_RULE_FLAGS: attributes.u32(),
-		NL80211_ATTR_FREQ_RANGE_START: attributes.u32(),
-		NL80211_ATTR_FREQ_RANGE_END: attributes.u32(),
-		NL80211_ATTR_FREQ_RANGE_MAX_BW: attributes.u32(),
-		NL80211_ATTR_POWER_RULE_MAX_ANT_GAIN: attributes.u32(),
-		NL80211_ATTR_POWER_RULE_MAX_EIRP: attributes.u32(),
-		NL80211_ATTR_DFS_CAC_TIME: attributes.u32()
-	}
-	
-	ATTRIBUTES_BSS = {
-		NL80211_BSS_BSSID: attributes.binary(),
-		NL80211_BSS_FREQUENCY: attributes.u32(),
-		NL80211_BSS_TSF: attributes.u64(),
-		NL80211_BSS_BEACON_INTERVAL: attributes.u16(),
-		NL80211_BSS_CAPABILITY: attributes.u16(),
-		NL80211_BSS_INFORMATION_ELEMENTS: attributes.binary(),
-		NL80211_BSS_SIGNAL_MBM: attributes.u32(),
-		NL80211_BSS_SIGNAL_UNSPEC: attributes.u8(),
-		NL80211_BSS_STATUS: attributes.u32(),
-		NL80211_BSS_SEEN_MS_AGO: attributes.u32(),
-		NL80211_BSS_BEACON_IES: attributes.binary(),
-		NL80211_BSS_CHAN_WIDTH: attributes.u32(),
-		NL80211_BSS_BEACON_TSF: attributes.u64(),
-		NL80211_BSS_PRESP_DATA: attributes.flag(),
-		NL80211_BSS_LAST_SEEN_BOOTTIME: attributes.u64(),
-		NL80211_BSS_PAD: attributes.padding(),
-		NL80211_BSS_PARENT_TSF: attributes.u64(),
-		NL80211_BSS_PARENT_BSSID: attributes.binary(),
-		NL80211_BSS_CHAIN_SIGNAL: attributes.array(attributes.u8()),
-		NL80211_BSS_FREQUENCY_OFFSET: attributes.u32()
-	}
-	
-	ATTRIBUTES_KEY_DEFAULT = {
-		NL80211_KEY_DEFAULT_TYPE_UNICAST: attributes.flag(),
-		NL80211_KEY_DEFAULT_TYPE_MULTICAST: attributes.flag()
-	}
-	
-	ATTRIBUTES_KEY = {
-		NL80211_KEY_DATA: attributes.binary(),
-		NL80211_KEY_IDX: attributes.u8(),
-		NL80211_KEY_CIPHER: attributes.u32(),
-		NL80211_KEY_SEQ: attributes.binary(),
-		NL80211_KEY_DEFAULT: attributes.flag(),
-		NL80211_KEY_DEFAULT_MGMT: attributes.flag(),
-		NL80211_KEY_TYPE: attributes.u32(),
-		NL80211_KEY_DEFAULT_TYPES: attributes.nested(ATTRIBUTES_KEY_DEFAULT),
-		NL80211_KEY_MODE: attributes.u8(),
-		NL80211_KEY_DEFAULT_BEACON: attributes.flag()
-	}
+    ATTRIBUTES_PKTPAT = {
+        NL80211_PKTPAT_MASK: attributes.binary(),
+        NL80211_PKTPAT_PATTERN: attributes.binary(),
+        NL80211_PKTPAT_OFFSET: attributes.u32(),
+    }
 
-	ATTRIBUTES.update({
-		#1 - 34
-		NL80211_ATTR_WIPHY: attributes.u32(),
-		NL80211_ATTR_WIPHY_NAME: attributes.string(),
-		NL80211_ATTR_IFINDEX: attributes.u32(),
-		NL80211_ATTR_IFNAME: attributes.string(),
-		NL80211_ATTR_IFTYPE: attributes.u32(),
-		NL80211_ATTR_MAC: attributes.binary(),
-		NL80211_ATTR_KEY_DATA: attributes.binary(),
-		NL80211_ATTR_KEY_IDX: attributes.u8(),
-		NL80211_ATTR_KEY_CIPHER: attributes.u32(),
-		NL80211_ATTR_KEY_SEQ: attributes.binary(),
-		NL80211_ATTR_KEY_DEFAULT: attributes.flag(),
-		NL80211_ATTR_BEACON_INTERVAL: attributes.u32(),
-		NL80211_ATTR_DTIM_PERIOD: attributes.u32(),
-		NL80211_ATTR_BEACON_HEAD: attributes.binary(),
-		NL80211_ATTR_BEACON_TAIL: attributes.binary(),
-		NL80211_ATTR_STA_AID: attributes.u16(),
-		NL80211_ATTR_STA_FLAGS: attributes.nested(ATTRIBUTES_STA_FLAG),
-		NL80211_ATTR_STA_LISTEN_INTERVAL: attributes.u16(),
-		NL80211_ATTR_STA_SUPPORTED_RATES: attributes.binary(),
-		NL80211_ATTR_STA_VLAN: attributes.u32(),
-		NL80211_ATTR_STA_INFO: attributes.nested(ATTRIBUTES_STA_INFO),
-		NL80211_ATTR_WIPHY_BANDS: attributes.dict(attributes.nested(ATTRIBUTES_BAND)),
-		NL80211_ATTR_MNTR_FLAGS: attributes.dict(attributes.flag()),
-		NL80211_ATTR_MESH_ID: attributes.binary(),
-		NL80211_ATTR_STA_PLINK_ACTION: attributes.u8(),
-		NL80211_ATTR_MPATH_NEXT_HOP: attributes.binary(),
-		NL80211_ATTR_MPATH_INFO: attributes.nested(ATTRIBUTES_MPATH_INFO),
-		NL80211_ATTR_BSS_CTS_PROT: attributes.u8(),
-		NL80211_ATTR_BSS_SHORT_PREAMBLE: attributes.u8(),
-		NL80211_ATTR_BSS_SHORT_SLOT_TIME: attributes.u8(),
-		NL80211_ATTR_HT_CAPABILITY: attributes.binary(),
-		NL80211_ATTR_SUPPORTED_IFTYPES: attributes.array(attributes.flag()),
-		NL80211_ATTR_REG_ALPHA2: attributes.string(),
-		NL80211_ATTR_REG_RULES: attributes.array(attributes.nested(ATTRIBUTES_REG_RULE)),
-		
-		#38 - 39
-		NL80211_ATTR_WIPHY_FREQ: attributes.u32(),
-		NL80211_ATTR_WIPHY_CHANNEL_TYPE: attributes.u32(),
-		
-		#41 - 57
-		NL80211_ATTR_MGMT_SUBTYPE: attributes.u8(),
-		NL80211_ATTR_IE: attributes.binary(),
-		NL80211_ATTR_MAX_NUM_SCAN_SSIDS: attributes.u8(),
-		NL80211_ATTR_SCAN_FREQUENCIES: attributes.array(attributes.u32()),
-		NL80211_ATTR_SCAN_SSIDS: attributes.array(attributes.binary()),
-		NL80211_ATTR_GENERATION: attributes.u32(),
-		NL80211_ATTR_BSS: attributes.nested(ATTRIBUTES_BSS),
-		NL80211_ATTR_REG_INITIATOR: attributes.u8(),
-		NL80211_ATTR_REG_TYPE: attributes.u8(),
-		NL80211_ATTR_SUPPORTED_COMMANDS: attributes.array(attributes.u32(), base=1),
-		NL80211_ATTR_FRAME: attributes.binary(),
-		NL80211_ATTR_SSID: attributes.binary(),
-		NL80211_ATTR_AUTH_TYPE: attributes.u32(),
-		NL80211_ATTR_REASON_CODE: attributes.u16(),
-		NL80211_ATTR_KEY_TYPE: attributes.u32(),
-		NL80211_ATTR_MAX_SCAN_IE_LEN: attributes.u16(),
-		NL80211_ATTR_CIPHER_SUITES: attributes.binary(),
-		
-		#61 - 68
-		NL80211_ATTR_WIPHY_RETRY_SHORT: attributes.u8(),
-		NL80211_ATTR_WIPHY_RETRY_LONG: attributes.u8(),
-		NL80211_ATTR_WIPHY_FRAG_THRESHOLD: attributes.u32(),
-		NL80211_ATTR_WIPHY_RTS_THRESHOLD: attributes.u32(),
-		NL80211_ATTR_TIMED_OUT: attributes.flag(),
-		NL80211_ATTR_USE_MFP: attributes.u32(),
-		NL80211_ATTR_STA_FLAGS2: attributes.binary(),
-		NL80211_ATTR_CONTROL_PORT: attributes.flag(),
-		
-		#70 - 83
-		NL80211_ATTR_PRIVACY: attributes.flag(),
-		NL80211_ATTR_DISCONNECTED_BY_AP: attributes.flag(),
-		NL80211_ATTR_STATUS_CODE: attributes.u16(),
-		NL80211_ATTR_CIPHER_SUITES_PAIRWISE: attributes.binary(),
-		NL80211_ATTR_CIPHER_SUITE_GROUP: attributes.u32(),
-		NL80211_ATTR_WPA_VERSIONS: attributes.u32(),
-		NL80211_ATTR_AKM_SUITES: attributes.binary(),
-		NL80211_ATTR_REQ_IE: attributes.binary(),
-		NL80211_ATTR_RESP_IE: attributes.binary(),
-		NL80211_ATTR_PREV_BSSID: attributes.binary(),
-		NL80211_ATTR_KEY: attributes.nested(ATTRIBUTES_KEY),
-		NL80211_ATTR_KEYS: attributes.array(attributes.nested(ATTRIBUTES_KEY)),
-		NL80211_ATTR_PID: attributes.u32(),
-		NL80211_ATTR_4ADDR: attributes.u8(),
-		
-		#86 - 89
-		NL80211_ATTR_MAX_NUM_PMKIDS: attributes.u8(),
-		NL80211_ATTR_DURATION: attributes.u32(),
-		NL80211_ATTR_COOKIE: attributes.u64(),
-		NL80211_ATTR_WIPHY_COVERAGE_CLASS: attributes.u8(),
-		
-		#91 - 92
-		NL80211_ATTR_FRAME_MATCH: attributes.binary(),
-		NL80211_ATTR_ACK: attributes.flag(),
-		
-		#94
-		NL80211_ATTR_CQM: attributes.nested(ATTRIBUTES_CQM),
-		
-		#98 - 106
-		NL80211_ATTR_WIPHY_TX_POWER_LEVEL: attributes.u32(),
-		NL80211_ATTR_TX_FRAME_TYPES: attributes.dict(attributes.array(attributes.u16())),
-		NL80211_ATTR_RX_FRAME_TYPES: attributes.dict(attributes.array(attributes.u16())),
-		NL80211_ATTR_FRAME_TYPE: attributes.u16(),
-		NL80211_ATTR_CONTROL_PORT_ETHERTYPE: attributes.binary(), # flag or u16
-		NL80211_ATTR_CONTROL_PORT_NO_ENCRYPT: attributes.flag(),
-		NL80211_ATTR_SUPPORT_IBSS_RSN: attributes.flag(),
-		NL80211_ATTR_WIPHY_ANTENNA_TX: attributes.u32(),
-		NL80211_ATTR_WIPHY_ANTENNA_RX: attributes.u32(),
-		
-		#108
-		NL80211_ATTR_OFFCHANNEL_TX_OK: attributes.flag(),
-		
-		#111
-		NL80211_ATTR_MAX_REMAIN_ON_CHANNEL_DURATION: attributes.u32(),
-		
-		#113 - 115
-		NL80211_ATTR_WIPHY_ANTENNA_AVAIL_TX: attributes.u32(),
-		NL80211_ATTR_WIPHY_ANTENNA_AVAIL_RX: attributes.u32(),
-		NL80211_ATTR_SUPPORT_MESH_AUTH: attributes.flag(),
-		
-		#118
-		NL80211_ATTR_WOWLAN_TRIGGERS_SUPPORTED: attributes.nested(ATTRIBUTES_WOWLAN_TRIG_SUPPORTED),
-		
-		#120 - 121
-		NL80211_ATTR_INTERFACE_COMBINATIONS: attributes.array(attributes.nested(ATTRIBUTES_IFACE_COMB), base=1),
-		NL80211_ATTR_SOFTWARE_IFTYPES: attributes.array(attributes.flag()),
-		
-		#123 - 126
-		NL80211_ATTR_MAX_NUM_SCHED_SCAN_SSIDS: attributes.u8(),
-		NL80211_ATTR_MAX_SCHED_SCAN_IE_LEN: attributes.u16(),
-		NL80211_ATTR_SCAN_SUPP_RATES: attributes.dict(attributes.binary()),
-		NL80211_ATTR_HIDDEN_SSID: attributes.u32(),
-		
-		#129 - 131
-		NL80211_ATTR_STA_WME: attributes.nested(ATTRIBUTES_STA_WME),
-		NL80211_ATTR_SUPPORT_AP_UAPSD: attributes.flag(),
-		NL80211_ATTR_ROAM_SUPPORT: attributes.flag(),
-		
-		#133
-		NL80211_ATTR_MAX_MATCH_SETS: attributes.u8(),
-		
-		#135 - 137
-		NL80211_ATTR_TX_NO_CCK_RATE: attributes.flag(),
-		NL80211_ATTR_TDLS_ACTION: attributes.u8(),
-		NL80211_ATTR_TDLS_DIALOG_TOKEN: attributes.u8(),
-		
-		#139 - 140
-		NL80211_ATTR_TDLS_SUPPORT: attributes.flag(),
-		NL80211_ATTR_TDLS_EXTERNAL_SETUP: attributes.flag(),
-		
-		#142 - 144
-		NL80211_ATTR_DONT_WAIT_FOR_ACK: attributes.flag(),
-		NL80211_ATTR_FEATURE_FLAGS: attributes.u32(),
-		NL80211_ATTR_PROBE_RESP_OFFLOAD: attributes.u32(),
-		
-		#148
-		NL80211_ATTR_HT_CAPABILITY_MASK: attributes.binary(),
-		
-		#151 - 153
-		NL80211_ATTR_RX_SIGNAL_DBM: attributes.u32(),
-		NL80211_ATTR_BG_SCAN_PERIOD: attributes.u16(),
-		NL80211_ATTR_WDEV: attributes.u64(),
-		
-		#158 - 161
-		NL80211_ATTR_SCAN_FLAGS: attributes.u32(),
-		NL80211_ATTR_CHANNEL_WIDTH: attributes.u32(),
-		NL80211_ATTR_CENTER_FREQ1: attributes.u32(),
-		NL80211_ATTR_CENTER_FREQ2: attributes.u32(),
-		
-		#166
-		NL80211_ATTR_MAC_ADDRS: attributes.array(attributes.binary(), base=1),
-		
-		#169 - 171
-		NL80211_ATTR_EXT_CAPA: attributes.binary(),
-		NL80211_ATTR_EXT_CAPA_MASK: attributes.binary(),
-		NL80211_ATTR_STA_CAPABILITY: attributes.u16(),
-		
-		#174
-		NL80211_ATTR_SPLIT_WIPHY_DUMP: attributes.flag(),
-		
-		#176
-		NL80211_ATTR_VHT_CAPABILITY_MASK: attributes.binary(),
-		
-		#189
-		NL80211_ATTR_STA_SUPPORTED_CHANNELS: attributes.binary(),
-		
-		#192 - 193
-		NL80211_ATTR_SUPPORT_5_MHZ: attributes.flag(),
-		NL80211_ATTR_SUPPORT_10_MHZ: attributes.flag(),
-		
-		#197 - 198
-		NL80211_ATTR_VENDOR_DATA: attributes.binary(), # Or nested (depends on command)
-		NL80211_ATTR_VENDOR_EVENTS: attributes.array(attributes.binary(), base=1),
-		
-		#200 - 202
-		NL80211_ATTR_MAC_HINT: attributes.binary(),
-		NL80211_ATTR_WIPHY_FREQ_HINT: attributes.u32(),
-		NL80211_ATTR_MAX_AP_ASSOC_STA: attributes.u32(),
-		
-		#204 - 206
-		NL80211_ATTR_SOCKET_OWNER: attributes.flag(),
-		NL80211_ATTR_CSA_C_OFFSETS_TX: attributes.binary(),
-		NL80211_ATTR_MAX_CSA_COUNTERS: attributes.u8(),
-		
-		#215 - 217
-		NL80211_ATTR_MAC_MASK: attributes.binary(),
-		NL80211_ATTR_WIPHY_SELF_MANAGED_REG: attributes.flag(),
-		NL80211_ATTR_EXT_FEATURES: attributes.binary(),
-		
-		#222 - 224
-		NL80211_ATTR_MAX_NUM_SCHED_SCAN_PLANS: attributes.u32(),
-		NL80211_ATTR_MAX_SCAN_PLAN_INTERVAL: attributes.u32(),
-		NL80211_ATTR_MAX_SCAN_PLAN_ITERATIONS: attributes.u32(),
-		
-		#229
-		NL80211_ATTR_PAD: attributes.padding(),
-		
-		#233 - 236
-		NL80211_ATTR_SCAN_START_TIME_TSF: attributes.u64(),
-		NL80211_ATTR_SCAN_START_TIME_TSF_BSSID: attributes.binary(),
-		NL80211_ATTR_MEASUREMENT_DURATION: attributes.u16(),
-		NL80211_ATTR_MEASUREMENT_DURATION_MANDATORY: attributes.flag(),
-		
-		#239
-		NL80211_ATTR_BANDS: attributes.u32(),
-		
-		#245
-		NL80211_ATTR_BSSID: attributes.binary(),
-		
-		#248
-		NL80211_ATTR_TIMEOUT_REASON: attributes.u32(),
-		
-		#254
-		NL80211_ATTR_PMK: attributes.binary(),
-		
-		#256 - 257
-		NL80211_ATTR_SCHED_SCAN_MAX_REQS: attributes.u32(),
-		NL80211_ATTR_WANT_1X_4WAY_HS: attributes.flag(),
-		
-		#264 - 268
-		NL80211_ATTR_CONTROL_PORT_OVER_NL80211: attributes.flag(),
-		NL80211_ATTR_TXQ_STATS: attributes.nested(ATTRIBUTES_TXQ_STATS),
-		NL80211_ATTR_TXQ_LIMIT: attributes.u32(),
-		NL80211_ATTR_TXQ_MEMORY_LIMIT: attributes.u32(),
-		NL80211_ATTR_TXQ_QUANTUM: attributes.u32(),
-		
-		#274
-		NL80211_ATTR_AIRTIME_WEIGHT: attributes.u16(),
-		
-		#277
-		NL80211_ATTR_SAE_PASSWORD: attributes.binary(),
-		
-		#280 - 281
-		NL80211_ATTR_WIPHY_EDMG_CHANNELS: attributes.u8(),
-		NL80211_ATTR_WIPHY_EDMG_BW_CONFIG: attributes.u8(),
-		
-		#286
-		NL80211_ATTR_CONTROL_PORT_NO_PREAUTH: attributes.flag(),
-		
-		#290
-		NL80211_ATTR_WIPHY_FREQ_OFFSET: attributes.u32(),
-		
-		#292
-		NL80211_ATTR_SCAN_FREQ_KHZ: attributes.array(attributes.u32()),
-		
-		#298
-		NL80211_ATTR_SAE_PWE: attributes.u8(),
-	})
+    ATTRIBUTES_WOWLAN_TCP = {
+        NL80211_WOWLAN_TCP_SRC_IPV4: attributes.u32(),
+        NL80211_WOWLAN_TCP_DST_IPV4: attributes.u32(),
+        NL80211_WOWLAN_TCP_DST_MAC: attributes.binary(),
+        NL80211_WOWLAN_TCP_SRC_PORT: attributes.u16(),
+        NL80211_WOWLAN_TCP_DST_PORT: attributes.u16(),
+        NL80211_WOWLAN_TCP_DATA_PAYLOAD: attributes.binary(),
+        NL80211_WOWLAN_TCP_DATA_PAYLOAD_SEQ: attributes.binary(),
+        NL80211_WOWLAN_TCP_DATA_PAYLOAD_TOKEN: attributes.binary(),
+        NL80211_WOWLAN_TCP_DATA_INTERVAL: attributes.u32(),
+        NL80211_WOWLAN_TCP_WAKE_PAYLOAD: attributes.binary(),
+        NL80211_WOWLAN_TCP_WAKE_MASK: attributes.binary(),
+    }
+
+    ATTRIBUTES_WOWLAN_TRIG = {
+        NL80211_WOWLAN_TRIG_ANY: attributes.flag(),
+        NL80211_WOWLAN_TRIG_DISCONNECT: attributes.flag(),
+        NL80211_WOWLAN_TRIG_MAGIC_PKT: attributes.flag(),
+        NL80211_WOWLAN_TRIG_PKT_PATTERN: attributes.binary(),  # Depends on command
+        NL80211_WOWLAN_TRIG_GTK_REKEY_SUPPORTED: attributes.flag(),
+        NL80211_WOWLAN_TRIG_GTK_REKEY_FAILURE: attributes.flag(),
+        NL80211_WOWLAN_TRIG_EAP_IDENT_REQUEST: attributes.flag(),
+        NL80211_WOWLAN_TRIG_4WAY_HANDSHAKE: attributes.flag(),
+        NL80211_WOWLAN_TRIG_RFKILL_RELEASE: attributes.flag(),
+        NL80211_WOWLAN_TRIG_WAKEUP_PKT_80211: attributes.binary(),
+        NL80211_WOWLAN_TRIG_WAKEUP_PKT_80211_LEN: attributes.u32(),
+        NL80211_WOWLAN_TRIG_WAKEUP_PKT_8023: attributes.binary(),
+        NL80211_WOWLAN_TRIG_WAKEUP_PKT_8023_LEN: attributes.u32(),
+        NL80211_WOWLAN_TRIG_TCP_CONNECTION: attributes.nested(ATTRIBUTES_WOWLAN_TCP),
+        NL80211_WOWLAN_TRIG_WAKEUP_TCP_MATCH: attributes.flag(),
+        NL80211_WOWLAN_TRIG_WAKEUP_TCP_CONNLOST: attributes.flag(),
+        NL80211_WOWLAN_TRIG_WAKEUP_TCP_NOMORETOKENS: attributes.flag(),
+        NL80211_WOWLAN_TRIG_NET_DETECT: attributes.nested(ATTRIBUTES),
+        NL80211_WOWLAN_TRIG_NET_DETECT_RESULTS: attributes.array(
+            attributes.nested(ATTRIBUTES)
+        ),
+    }
+
+    ATTRIBUTES_WOWLAN_TRIG_SUPPORTED = ATTRIBUTES_WOWLAN_TRIG.copy()
+    ATTRIBUTES_WOWLAN_TRIG_SUPPORTED.update(
+        {NL80211_WOWLAN_TRIG_NET_DETECT: attributes.u32()}
+    )
+
+    ATTRIBUTES_IFACE_LIMIT = {
+        NL80211_IFACE_LIMIT_MAX: attributes.u32(),
+        NL80211_IFACE_LIMIT_TYPES: attributes.array(attributes.flag()),
+    }
+
+    ATTRIBUTES_IFACE_COMB = {
+        NL80211_IFACE_COMB_LIMITS: attributes.array(
+            attributes.nested(ATTRIBUTES_IFACE_LIMIT), base=1
+        ),
+        NL80211_IFACE_COMB_MAXNUM: attributes.u32(),
+        NL80211_IFACE_COMB_STA_AP_BI_MATCH: attributes.flag(),
+        NL80211_IFACE_COMB_NUM_CHANNELS: attributes.u32(),
+        NL80211_IFACE_COMB_RADAR_DETECT_WIDTHS: attributes.u32(),
+        NL80211_IFACE_COMB_RADAR_DETECT_REGIONS: attributes.u32(),
+        NL80211_IFACE_COMB_BI_MIN_GCD: attributes.u32(),
+    }
+
+    ATTRIBUTES_RATE_INFO = {
+        NL80211_RATE_INFO_BITRATE: attributes.u16(),
+        NL80211_RATE_INFO_MCS: attributes.u8(),
+        NL80211_RATE_INFO_40_MHZ_WIDTH: attributes.flag(),
+        NL80211_RATE_INFO_SHORT_GI: attributes.flag(),
+        NL80211_RATE_INFO_BITRATE32: attributes.u32(),
+        NL80211_RATE_INFO_VHT_MCS: attributes.u8(),
+        NL80211_RATE_INFO_VHT_NSS: attributes.u8(),
+        NL80211_RATE_INFO_80_MHZ_WIDTH: attributes.flag(),
+        NL80211_RATE_INFO_80P80_MHZ_WIDTH: attributes.flag(),
+        NL80211_RATE_INFO_160_MHZ_WIDTH: attributes.flag(),
+        NL80211_RATE_INFO_10_MHZ_WIDTH: attributes.flag(),
+        NL80211_RATE_INFO_5_MHZ_WIDTH: attributes.flag(),
+        NL80211_RATE_INFO_HE_MCS: attributes.u8(),
+        NL80211_RATE_INFO_HE_NSS: attributes.u8(),
+        NL80211_RATE_INFO_HE_GI: attributes.u8(),
+        NL80211_RATE_INFO_HE_DCM: attributes.u8(),
+        NL80211_RATE_INFO_HE_RU_ALLOC: attributes.u8(),
+    }
+
+    ATTRIBUTES_TXQ_STATS = {
+        NL80211_TXQ_STATS_BACKLOG_BYTES: attributes.u32(),
+        NL80211_TXQ_STATS_BACKLOG_PACKETS: attributes.u32(),
+        NL80211_TXQ_STATS_FLOWS: attributes.u32(),
+        NL80211_TXQ_STATS_DROPS: attributes.u32(),
+        NL80211_TXQ_STATS_ECN_MARKS: attributes.u32(),
+        NL80211_TXQ_STATS_OVERLIMIT: attributes.u32(),
+        NL80211_TXQ_STATS_OVERMEMORY: attributes.u32(),
+        NL80211_TXQ_STATS_COLLISIONS: attributes.u32(),
+        NL80211_TXQ_STATS_TX_BYTES: attributes.u32(),
+        NL80211_TXQ_STATS_TX_PACKETS: attributes.u32(),
+        NL80211_TXQ_STATS_MAX_FLOWS: attributes.u32(),
+    }
+
+    ATTRIBUTES_TID_STATS = {
+        NL80211_TID_STATS_RX_MSDU: attributes.u64(),
+        NL80211_TID_STATS_TX_MSDU: attributes.u64(),
+        NL80211_TID_STATS_TX_MSDU_RETRIES: attributes.u64(),
+        NL80211_TID_STATS_TX_MSDU_FAILED: attributes.u64(),
+        NL80211_TID_STATS_PAD: attributes.padding(),
+        NL80211_TID_STATS_TXQ_STATS: attributes.nested(ATTRIBUTES_TXQ_STATS),
+    }
+
+    ATTRIBUTES_STA_BSS_PARAM = {
+        NL80211_STA_BSS_PARAM_CTS_PROT: attributes.flag(),
+        NL80211_STA_BSS_PARAM_SHORT_PREAMBLE: attributes.flag(),
+        NL80211_STA_BSS_PARAM_SHORT_SLOT_TIME: attributes.flag(),
+        NL80211_STA_BSS_PARAM_DTIM_PERIOD: attributes.u8(),
+        NL80211_STA_BSS_PARAM_BEACON_INTERVAL: attributes.u16(),
+    }
+
+    ATTRIBUTES_STA_FLAG = {
+        NL80211_STA_FLAG_AUTHORIZED: attributes.flag(),
+        NL80211_STA_FLAG_SHORT_PREAMBLE: attributes.flag(),
+        NL80211_STA_FLAG_WME: attributes.flag(),
+        NL80211_STA_FLAG_MFP: attributes.flag(),
+        NL80211_STA_FLAG_AUTHENTICATED: attributes.flag(),
+        NL80211_STA_FLAG_TDLS_PEER: attributes.flag(),
+        NL80211_STA_FLAG_ASSOCIATED: attributes.flag(),
+    }
+
+    ATTRIBUTES_STA_INFO = {
+        NL80211_STA_INFO_INACTIVE_TIME: attributes.u32(),
+        NL80211_STA_INFO_RX_BYTES: attributes.u32(),
+        NL80211_STA_INFO_TX_BYTES: attributes.u32(),
+        NL80211_STA_INFO_LLID: attributes.u16(),
+        NL80211_STA_INFO_PLID: attributes.u16(),
+        NL80211_STA_INFO_PLINK_STATE: attributes.u8(),
+        NL80211_STA_INFO_SIGNAL: attributes.u8(),
+        NL80211_STA_INFO_TX_BITRATE: attributes.nested(ATTRIBUTES_RATE_INFO),
+        NL80211_STA_INFO_RX_PACKETS: attributes.u32(),
+        NL80211_STA_INFO_TX_PACKETS: attributes.u32(),
+        NL80211_STA_INFO_TX_RETRIES: attributes.u32(),
+        NL80211_STA_INFO_TX_FAILED: attributes.u32(),
+        NL80211_STA_INFO_SIGNAL_AVG: attributes.u8(),
+        NL80211_STA_INFO_RX_BITRATE: attributes.nested(ATTRIBUTES_RATE_INFO),
+        NL80211_STA_INFO_BSS_PARAM: attributes.nested(ATTRIBUTES_STA_BSS_PARAM),
+        NL80211_STA_INFO_CONNECTED_TIME: attributes.u32(),
+        NL80211_STA_INFO_STA_FLAGS: attributes.binary(),
+        NL80211_STA_INFO_BEACON_LOSS: attributes.u32(),
+        NL80211_STA_INFO_T_OFFSET: attributes.u64(),
+        NL80211_STA_INFO_LOCAL_PM: attributes.u32(),
+        NL80211_STA_INFO_PEER_PM: attributes.u32(),
+        NL80211_STA_INFO_NONPEER_PM: attributes.u32(),
+        NL80211_STA_INFO_RX_BYTES64: attributes.u64(),
+        NL80211_STA_INFO_TX_BYTES64: attributes.u64(),
+        NL80211_STA_INFO_CHAIN_SIGNAL: attributes.array(attributes.u8()),
+        NL80211_STA_INFO_CHAIN_SIGNAL_AVG: attributes.array(attributes.u8()),
+        NL80211_STA_INFO_EXPECTED_THROUGHPUT: attributes.u32(),
+        NL80211_STA_INFO_RX_DROP_MISC: attributes.u64(),
+        NL80211_STA_INFO_BEACON_RX: attributes.u64(),
+        NL80211_STA_INFO_BEACON_SIGNAL_AVG: attributes.u8(),
+        NL80211_STA_INFO_TID_STATS: attributes.array(
+            attributes.nested(ATTRIBUTES_TID_STATS), base=1
+        ),
+        NL80211_STA_INFO_RX_DURATION: attributes.u64(),
+        NL80211_STA_INFO_PAD: attributes.padding(),
+        NL80211_STA_INFO_ACK_SIGNAL: attributes.u8(),
+        NL80211_STA_INFO_ACK_SIGNAL_AVG: attributes.s8(),
+        NL80211_STA_INFO_RX_MPDUS: attributes.u32(),
+        NL80211_STA_INFO_FCS_ERROR_COUNT: attributes.u32(),
+        NL80211_STA_INFO_CONNECTED_TO_GATE: attributes.u8(),
+        NL80211_STA_INFO_TX_DURATION: attributes.u64(),
+        NL80211_STA_INFO_AIRTIME_WEIGHT: attributes.u16(),
+        NL80211_STA_INFO_AIRTIME_LINK_METRIC: attributes.u32(),
+        NL80211_STA_INFO_ASSOC_AT_BOOTTIME: attributes.u64(),
+        NL80211_STA_INFO_CONNECTED_TO_AS: attributes.u8(),
+    }
+
+    ATTRIBUTES_STA_WME = {
+        NL80211_STA_WME_UAPSD_QUEUES: attributes.u8(),
+        NL80211_STA_WME_MAX_SP: attributes.u8(),
+    }
+
+    ATTRIBUTES_MPATH_INFO = {
+        NL80211_MPATH_INFO_FRAME_QLEN: attributes.u32(),
+        NL80211_MPATH_INFO_SN: attributes.u32(),
+        NL80211_MPATH_INFO_METRIC: attributes.u32(),
+        NL80211_MPATH_INFO_EXPTIME: attributes.u32(),
+        NL80211_MPATH_INFO_FLAGS: attributes.u8(),
+        NL80211_MPATH_INFO_DISCOVERY_TIMEOUT: attributes.u32(),
+        NL80211_MPATH_INFO_DISCOVERY_RETRIES: attributes.u8(),
+        NL80211_MPATH_INFO_HOP_COUNT: attributes.u8(),
+        NL80211_MPATH_INFO_PATH_CHANGE: attributes.u32(),
+    }
+
+    ATTRIBUTES_REG_RULE = {
+        NL80211_ATTR_REG_RULE_FLAGS: attributes.u32(),
+        NL80211_ATTR_FREQ_RANGE_START: attributes.u32(),
+        NL80211_ATTR_FREQ_RANGE_END: attributes.u32(),
+        NL80211_ATTR_FREQ_RANGE_MAX_BW: attributes.u32(),
+        NL80211_ATTR_POWER_RULE_MAX_ANT_GAIN: attributes.u32(),
+        NL80211_ATTR_POWER_RULE_MAX_EIRP: attributes.u32(),
+        NL80211_ATTR_DFS_CAC_TIME: attributes.u32(),
+    }
+
+    ATTRIBUTES_BSS = {
+        NL80211_BSS_BSSID: attributes.binary(),
+        NL80211_BSS_FREQUENCY: attributes.u32(),
+        NL80211_BSS_TSF: attributes.u64(),
+        NL80211_BSS_BEACON_INTERVAL: attributes.u16(),
+        NL80211_BSS_CAPABILITY: attributes.u16(),
+        NL80211_BSS_INFORMATION_ELEMENTS: attributes.binary(),
+        NL80211_BSS_SIGNAL_MBM: attributes.u32(),
+        NL80211_BSS_SIGNAL_UNSPEC: attributes.u8(),
+        NL80211_BSS_STATUS: attributes.u32(),
+        NL80211_BSS_SEEN_MS_AGO: attributes.u32(),
+        NL80211_BSS_BEACON_IES: attributes.binary(),
+        NL80211_BSS_CHAN_WIDTH: attributes.u32(),
+        NL80211_BSS_BEACON_TSF: attributes.u64(),
+        NL80211_BSS_PRESP_DATA: attributes.flag(),
+        NL80211_BSS_LAST_SEEN_BOOTTIME: attributes.u64(),
+        NL80211_BSS_PAD: attributes.padding(),
+        NL80211_BSS_PARENT_TSF: attributes.u64(),
+        NL80211_BSS_PARENT_BSSID: attributes.binary(),
+        NL80211_BSS_CHAIN_SIGNAL: attributes.array(attributes.u8()),
+        NL80211_BSS_FREQUENCY_OFFSET: attributes.u32(),
+    }
+
+    ATTRIBUTES_KEY_DEFAULT = {
+        NL80211_KEY_DEFAULT_TYPE_UNICAST: attributes.flag(),
+        NL80211_KEY_DEFAULT_TYPE_MULTICAST: attributes.flag(),
+    }
+
+    ATTRIBUTES_KEY = {
+        NL80211_KEY_DATA: attributes.binary(),
+        NL80211_KEY_IDX: attributes.u8(),
+        NL80211_KEY_CIPHER: attributes.u32(),
+        NL80211_KEY_SEQ: attributes.binary(),
+        NL80211_KEY_DEFAULT: attributes.flag(),
+        NL80211_KEY_DEFAULT_MGMT: attributes.flag(),
+        NL80211_KEY_TYPE: attributes.u32(),
+        NL80211_KEY_DEFAULT_TYPES: attributes.nested(ATTRIBUTES_KEY_DEFAULT),
+        NL80211_KEY_MODE: attributes.u8(),
+        NL80211_KEY_DEFAULT_BEACON: attributes.flag(),
+    }
+
+    ATTRIBUTES.update(
+        {
+            # 1 - 34
+            NL80211_ATTR_WIPHY: attributes.u32(),
+            NL80211_ATTR_WIPHY_NAME: attributes.string(),
+            NL80211_ATTR_IFINDEX: attributes.u32(),
+            NL80211_ATTR_IFNAME: attributes.string(),
+            NL80211_ATTR_IFTYPE: attributes.u32(),
+            NL80211_ATTR_MAC: attributes.binary(),
+            NL80211_ATTR_KEY_DATA: attributes.binary(),
+            NL80211_ATTR_KEY_IDX: attributes.u8(),
+            NL80211_ATTR_KEY_CIPHER: attributes.u32(),
+            NL80211_ATTR_KEY_SEQ: attributes.binary(),
+            NL80211_ATTR_KEY_DEFAULT: attributes.flag(),
+            NL80211_ATTR_BEACON_INTERVAL: attributes.u32(),
+            NL80211_ATTR_DTIM_PERIOD: attributes.u32(),
+            NL80211_ATTR_BEACON_HEAD: attributes.binary(),
+            NL80211_ATTR_BEACON_TAIL: attributes.binary(),
+            NL80211_ATTR_STA_AID: attributes.u16(),
+            NL80211_ATTR_STA_FLAGS: attributes.nested(ATTRIBUTES_STA_FLAG),
+            NL80211_ATTR_STA_LISTEN_INTERVAL: attributes.u16(),
+            NL80211_ATTR_STA_SUPPORTED_RATES: attributes.binary(),
+            NL80211_ATTR_STA_VLAN: attributes.u32(),
+            NL80211_ATTR_STA_INFO: attributes.nested(ATTRIBUTES_STA_INFO),
+            NL80211_ATTR_WIPHY_BANDS: attributes.dict(
+                attributes.nested(ATTRIBUTES_BAND)
+            ),
+            NL80211_ATTR_MNTR_FLAGS: attributes.dict(attributes.flag()),
+            NL80211_ATTR_MESH_ID: attributes.binary(),
+            NL80211_ATTR_STA_PLINK_ACTION: attributes.u8(),
+            NL80211_ATTR_MPATH_NEXT_HOP: attributes.binary(),
+            NL80211_ATTR_MPATH_INFO: attributes.nested(ATTRIBUTES_MPATH_INFO),
+            NL80211_ATTR_BSS_CTS_PROT: attributes.u8(),
+            NL80211_ATTR_BSS_SHORT_PREAMBLE: attributes.u8(),
+            NL80211_ATTR_BSS_SHORT_SLOT_TIME: attributes.u8(),
+            NL80211_ATTR_HT_CAPABILITY: attributes.binary(),
+            NL80211_ATTR_SUPPORTED_IFTYPES: attributes.array(attributes.flag()),
+            NL80211_ATTR_REG_ALPHA2: attributes.string(),
+            NL80211_ATTR_REG_RULES: attributes.array(
+                attributes.nested(ATTRIBUTES_REG_RULE)
+            ),
+            # 38 - 39
+            NL80211_ATTR_WIPHY_FREQ: attributes.u32(),
+            NL80211_ATTR_WIPHY_CHANNEL_TYPE: attributes.u32(),
+            # 41 - 57
+            NL80211_ATTR_MGMT_SUBTYPE: attributes.u8(),
+            NL80211_ATTR_IE: attributes.binary(),
+            NL80211_ATTR_MAX_NUM_SCAN_SSIDS: attributes.u8(),
+            NL80211_ATTR_SCAN_FREQUENCIES: attributes.array(attributes.u32()),
+            NL80211_ATTR_SCAN_SSIDS: attributes.array(attributes.binary()),
+            NL80211_ATTR_GENERATION: attributes.u32(),
+            NL80211_ATTR_BSS: attributes.nested(ATTRIBUTES_BSS),
+            NL80211_ATTR_REG_INITIATOR: attributes.u8(),
+            NL80211_ATTR_REG_TYPE: attributes.u8(),
+            NL80211_ATTR_SUPPORTED_COMMANDS: attributes.array(attributes.u32(), base=1),
+            NL80211_ATTR_FRAME: attributes.binary(),
+            NL80211_ATTR_SSID: attributes.binary(),
+            NL80211_ATTR_AUTH_TYPE: attributes.u32(),
+            NL80211_ATTR_REASON_CODE: attributes.u16(),
+            NL80211_ATTR_KEY_TYPE: attributes.u32(),
+            NL80211_ATTR_MAX_SCAN_IE_LEN: attributes.u16(),
+            NL80211_ATTR_CIPHER_SUITES: attributes.binary(),
+            # 61 - 68
+            NL80211_ATTR_WIPHY_RETRY_SHORT: attributes.u8(),
+            NL80211_ATTR_WIPHY_RETRY_LONG: attributes.u8(),
+            NL80211_ATTR_WIPHY_FRAG_THRESHOLD: attributes.u32(),
+            NL80211_ATTR_WIPHY_RTS_THRESHOLD: attributes.u32(),
+            NL80211_ATTR_TIMED_OUT: attributes.flag(),
+            NL80211_ATTR_USE_MFP: attributes.u32(),
+            NL80211_ATTR_STA_FLAGS2: attributes.binary(),
+            NL80211_ATTR_CONTROL_PORT: attributes.flag(),
+            # 70 - 83
+            NL80211_ATTR_PRIVACY: attributes.flag(),
+            NL80211_ATTR_DISCONNECTED_BY_AP: attributes.flag(),
+            NL80211_ATTR_STATUS_CODE: attributes.u16(),
+            NL80211_ATTR_CIPHER_SUITES_PAIRWISE: attributes.binary(),
+            NL80211_ATTR_CIPHER_SUITE_GROUP: attributes.u32(),
+            NL80211_ATTR_WPA_VERSIONS: attributes.u32(),
+            NL80211_ATTR_AKM_SUITES: attributes.binary(),
+            NL80211_ATTR_REQ_IE: attributes.binary(),
+            NL80211_ATTR_RESP_IE: attributes.binary(),
+            NL80211_ATTR_PREV_BSSID: attributes.binary(),
+            NL80211_ATTR_KEY: attributes.nested(ATTRIBUTES_KEY),
+            NL80211_ATTR_KEYS: attributes.array(attributes.nested(ATTRIBUTES_KEY)),
+            NL80211_ATTR_PID: attributes.u32(),
+            NL80211_ATTR_4ADDR: attributes.u8(),
+            # 86 - 89
+            NL80211_ATTR_MAX_NUM_PMKIDS: attributes.u8(),
+            NL80211_ATTR_DURATION: attributes.u32(),
+            NL80211_ATTR_COOKIE: attributes.u64(),
+            NL80211_ATTR_WIPHY_COVERAGE_CLASS: attributes.u8(),
+            # 91 - 92
+            NL80211_ATTR_FRAME_MATCH: attributes.binary(),
+            NL80211_ATTR_ACK: attributes.flag(),
+            # 94
+            NL80211_ATTR_CQM: attributes.nested(ATTRIBUTES_CQM),
+            # 98 - 106
+            NL80211_ATTR_WIPHY_TX_POWER_LEVEL: attributes.u32(),
+            NL80211_ATTR_TX_FRAME_TYPES: attributes.dict(
+                attributes.array(attributes.u16())
+            ),
+            NL80211_ATTR_RX_FRAME_TYPES: attributes.dict(
+                attributes.array(attributes.u16())
+            ),
+            NL80211_ATTR_FRAME_TYPE: attributes.u16(),
+            NL80211_ATTR_CONTROL_PORT_ETHERTYPE: attributes.binary(),  # flag or u16
+            NL80211_ATTR_CONTROL_PORT_NO_ENCRYPT: attributes.flag(),
+            NL80211_ATTR_SUPPORT_IBSS_RSN: attributes.flag(),
+            NL80211_ATTR_WIPHY_ANTENNA_TX: attributes.u32(),
+            NL80211_ATTR_WIPHY_ANTENNA_RX: attributes.u32(),
+            # 108
+            NL80211_ATTR_OFFCHANNEL_TX_OK: attributes.flag(),
+            # 111
+            NL80211_ATTR_MAX_REMAIN_ON_CHANNEL_DURATION: attributes.u32(),
+            # 113 - 115
+            NL80211_ATTR_WIPHY_ANTENNA_AVAIL_TX: attributes.u32(),
+            NL80211_ATTR_WIPHY_ANTENNA_AVAIL_RX: attributes.u32(),
+            NL80211_ATTR_SUPPORT_MESH_AUTH: attributes.flag(),
+            # 118
+            NL80211_ATTR_WOWLAN_TRIGGERS_SUPPORTED: attributes.nested(
+                ATTRIBUTES_WOWLAN_TRIG_SUPPORTED
+            ),
+            # 120 - 121
+            NL80211_ATTR_INTERFACE_COMBINATIONS: attributes.array(
+                attributes.nested(ATTRIBUTES_IFACE_COMB), base=1
+            ),
+            NL80211_ATTR_SOFTWARE_IFTYPES: attributes.array(attributes.flag()),
+            # 123 - 126
+            NL80211_ATTR_MAX_NUM_SCHED_SCAN_SSIDS: attributes.u8(),
+            NL80211_ATTR_MAX_SCHED_SCAN_IE_LEN: attributes.u16(),
+            NL80211_ATTR_SCAN_SUPP_RATES: attributes.dict(attributes.binary()),
+            NL80211_ATTR_HIDDEN_SSID: attributes.u32(),
+            # 129 - 131
+            NL80211_ATTR_STA_WME: attributes.nested(ATTRIBUTES_STA_WME),
+            NL80211_ATTR_SUPPORT_AP_UAPSD: attributes.flag(),
+            NL80211_ATTR_ROAM_SUPPORT: attributes.flag(),
+            # 133
+            NL80211_ATTR_MAX_MATCH_SETS: attributes.u8(),
+            # 135 - 137
+            NL80211_ATTR_TX_NO_CCK_RATE: attributes.flag(),
+            NL80211_ATTR_TDLS_ACTION: attributes.u8(),
+            NL80211_ATTR_TDLS_DIALOG_TOKEN: attributes.u8(),
+            # 139 - 140
+            NL80211_ATTR_TDLS_SUPPORT: attributes.flag(),
+            NL80211_ATTR_TDLS_EXTERNAL_SETUP: attributes.flag(),
+            # 142 - 144
+            NL80211_ATTR_DONT_WAIT_FOR_ACK: attributes.flag(),
+            NL80211_ATTR_FEATURE_FLAGS: attributes.u32(),
+            NL80211_ATTR_PROBE_RESP_OFFLOAD: attributes.u32(),
+            # 148
+            NL80211_ATTR_HT_CAPABILITY_MASK: attributes.binary(),
+            # 151 - 153
+            NL80211_ATTR_RX_SIGNAL_DBM: attributes.u32(),
+            NL80211_ATTR_BG_SCAN_PERIOD: attributes.u16(),
+            NL80211_ATTR_WDEV: attributes.u64(),
+            # 158 - 161
+            NL80211_ATTR_SCAN_FLAGS: attributes.u32(),
+            NL80211_ATTR_CHANNEL_WIDTH: attributes.u32(),
+            NL80211_ATTR_CENTER_FREQ1: attributes.u32(),
+            NL80211_ATTR_CENTER_FREQ2: attributes.u32(),
+            # 166
+            NL80211_ATTR_MAC_ADDRS: attributes.array(attributes.binary(), base=1),
+            # 169 - 171
+            NL80211_ATTR_EXT_CAPA: attributes.binary(),
+            NL80211_ATTR_EXT_CAPA_MASK: attributes.binary(),
+            NL80211_ATTR_STA_CAPABILITY: attributes.u16(),
+            # 174
+            NL80211_ATTR_SPLIT_WIPHY_DUMP: attributes.flag(),
+            # 176
+            NL80211_ATTR_VHT_CAPABILITY_MASK: attributes.binary(),
+            # 189
+            NL80211_ATTR_STA_SUPPORTED_CHANNELS: attributes.binary(),
+            # 192 - 193
+            NL80211_ATTR_SUPPORT_5_MHZ: attributes.flag(),
+            NL80211_ATTR_SUPPORT_10_MHZ: attributes.flag(),
+            # 197 - 198
+            NL80211_ATTR_VENDOR_DATA: attributes.binary(),  # Or nested (depends on command)
+            NL80211_ATTR_VENDOR_EVENTS: attributes.array(attributes.binary(), base=1),
+            # 200 - 202
+            NL80211_ATTR_MAC_HINT: attributes.binary(),
+            NL80211_ATTR_WIPHY_FREQ_HINT: attributes.u32(),
+            NL80211_ATTR_MAX_AP_ASSOC_STA: attributes.u32(),
+            # 204 - 206
+            NL80211_ATTR_SOCKET_OWNER: attributes.flag(),
+            NL80211_ATTR_CSA_C_OFFSETS_TX: attributes.binary(),
+            NL80211_ATTR_MAX_CSA_COUNTERS: attributes.u8(),
+            # 215 - 217
+            NL80211_ATTR_MAC_MASK: attributes.binary(),
+            NL80211_ATTR_WIPHY_SELF_MANAGED_REG: attributes.flag(),
+            NL80211_ATTR_EXT_FEATURES: attributes.binary(),
+            # 222 - 224
+            NL80211_ATTR_MAX_NUM_SCHED_SCAN_PLANS: attributes.u32(),
+            NL80211_ATTR_MAX_SCAN_PLAN_INTERVAL: attributes.u32(),
+            NL80211_ATTR_MAX_SCAN_PLAN_ITERATIONS: attributes.u32(),
+            # 229
+            NL80211_ATTR_PAD: attributes.padding(),
+            # 233 - 236
+            NL80211_ATTR_SCAN_START_TIME_TSF: attributes.u64(),
+            NL80211_ATTR_SCAN_START_TIME_TSF_BSSID: attributes.binary(),
+            NL80211_ATTR_MEASUREMENT_DURATION: attributes.u16(),
+            NL80211_ATTR_MEASUREMENT_DURATION_MANDATORY: attributes.flag(),
+            # 239
+            NL80211_ATTR_BANDS: attributes.u32(),
+            # 245
+            NL80211_ATTR_BSSID: attributes.binary(),
+            # 248
+            NL80211_ATTR_TIMEOUT_REASON: attributes.u32(),
+            # 254
+            NL80211_ATTR_PMK: attributes.binary(),
+            # 256 - 257
+            NL80211_ATTR_SCHED_SCAN_MAX_REQS: attributes.u32(),
+            NL80211_ATTR_WANT_1X_4WAY_HS: attributes.flag(),
+            # 264 - 268
+            NL80211_ATTR_CONTROL_PORT_OVER_NL80211: attributes.flag(),
+            NL80211_ATTR_TXQ_STATS: attributes.nested(ATTRIBUTES_TXQ_STATS),
+            NL80211_ATTR_TXQ_LIMIT: attributes.u32(),
+            NL80211_ATTR_TXQ_MEMORY_LIMIT: attributes.u32(),
+            NL80211_ATTR_TXQ_QUANTUM: attributes.u32(),
+            # 274
+            NL80211_ATTR_AIRTIME_WEIGHT: attributes.u16(),
+            # 277
+            NL80211_ATTR_SAE_PASSWORD: attributes.binary(),
+            # 280 - 281
+            NL80211_ATTR_WIPHY_EDMG_CHANNELS: attributes.u8(),
+            NL80211_ATTR_WIPHY_EDMG_BW_CONFIG: attributes.u8(),
+            # 286
+            NL80211_ATTR_CONTROL_PORT_NO_PREAUTH: attributes.flag(),
+            # 290
+            NL80211_ATTR_WIPHY_FREQ_OFFSET: attributes.u32(),
+            # 292
+            NL80211_ATTR_SCAN_FREQ_KHZ: attributes.array(attributes.u32()),
+            # 298
+            NL80211_ATTR_SAE_PWE: attributes.u8(),
+        }
+    )
 
 
 @contextlib.asynccontextmanager
 async def connect():
-	async with generic.connect() as ctrl:
-		yield await ctrl.get("nl80211", NL80211)
+    async with generic.connect() as ctrl:
+        yield await ctrl.get("nl80211", NL80211)

@@ -206,7 +206,7 @@ async def connect(proto, loop: Optional[asyncio.AbstractEventLoop] = None):
         sock.setsockopt(SOL_NETLINK, NETLINK_CAP_ACK, True)
         sock.setsockopt(SOL_NETLINK, NETLINK_EXT_ACK, True)
 
-        sock.bind((os.getgid(), 0))
+        sock.bind((os.getpid(), 0))
         netlink_socket = NetlinkSocket(sock, loop)
         task = asyncio.create_task(netlink_socket.start())
         yield netlink_socket

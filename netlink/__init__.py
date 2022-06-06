@@ -146,7 +146,7 @@ class NetlinkSocket:
                         self.pending.pop(sequence).set()
                     else:
                         logger.warning("Received unexpected ack or error packet")
-                if sequence == 0:
+                elif sequence == 0:
                     await self.package_queue.put(message)
                 elif sequence in self.packets:
                     self.packets[sequence].append(message)
@@ -163,7 +163,7 @@ class NetlinkSocket:
     async def receive(self):
         return await self.package_queue.get()
 
-    async def request(self, type, payload=b"", flags=0, timeout=3) -> List[NetlinkMessage]:
+    async def request(self, type: int, payload=b"", flags=0, timeout=3) -> List[NetlinkMessage]:
         event = asyncio.Event()
 
         sequence = next(self.sequence)

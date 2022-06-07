@@ -18,5 +18,5 @@ setuptools.setup(
 	url = "https://github.com/kinnay/netlink",
 	license = "GPLv3",
 	platforms = ["Linux"],
-	packages = ["netlink"],
+	packages = setuptools.find_packages("."),
 )

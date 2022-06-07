@@ -8,6 +8,7 @@ import struct
 from typing import Dict, List, Optional
 
 from netlink import attributes
+from netlink.structs import HEADER
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,6 @@ NETLINK_GET_STRICT_CHK = 12
 
 SOL_NETLINK = 270
 
-
 ATTRIBUTES_ERROR = {
     NLMSGERR_ATTR_MSG: attributes.string(),
     NLMSGERR_ATTR_OFFS: attributes.u32(),
@@ -136,7 +136,7 @@ class NetlinkSocket:
         while True:
             data = await self.loop.sock_recv(self.socket, 65536)
             while data:
-                length, type, flags, sequence, _ = struct.unpack_from("IHHII", data)
+                length, type, flags, sequence, _ = HEADER.unpack_from(data)
                 payload = data[16:length]
 
                 message = NetlinkMessage(type, flags, payload)
@@ -163,7 +163,9 @@ class NetlinkSocket:
     async def receive(self):
         return await self.package_queue.get()
 
-    async def request(self, type: int, payload=b"", flags=0, timeout=3) -> List[NetlinkMessage]:
+    async def request(
+        self, type: int, payload=b"", flags=0, timeout=3
+    ) -> List[NetlinkMessage]:
         event = asyncio.Event()
 
         sequence = next(self.sequence)
@@ -173,13 +175,13 @@ class NetlinkSocket:
         flags |= NLM_F_REQUEST | NLM_F_ACK
 
         length = 16 + len(payload)
-        header = struct.pack("IHHII", length, type, flags, sequence, self.pid)
+        header = HEADER.pack(length, type, flags, sequence, self.pid)
         await self.send(header + payload)
 
         try:
             await asyncio.wait_for(event.wait(), timeout)
         except TimeoutError as e:
-            logger.error("No response in {timeout}s: {e}")
+            logger.error(f"No response in {timeout}s: {e}")
 
         response = self.replies.pop(sequence)
         if response.type == NLMSG_ERROR:
@@ -201,8 +203,8 @@ class NetlinkSocket:
 
 
 @contextlib.asynccontextmanager
-async def connect(proto, loop: Optional[asyncio.AbstractEventLoop] = None):
-    with socket.socket(socket.AF_NETLINK, socket.SOCK_DGRAM, proto) as sock:
+async def connect(netlink_family, loop: Optional[asyncio.AbstractEventLoop] = None):
+    with socket.socket(socket.AF_NETLINK, socket.SOCK_DGRAM, netlink_family) as sock:
         sock.setsockopt(SOL_NETLINK, NETLINK_CAP_ACK, True)
         sock.setsockopt(SOL_NETLINK, NETLINK_EXT_ACK, True)
 

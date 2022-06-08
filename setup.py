@@ -19,4 +19,7 @@ setuptools.setup(
 	license = "GPLv3",
 	platforms = ["Linux"],
 	packages = setuptools.find_packages("."),
+	package_data = {
+        "netlink": ["py.typed"],
+    },
 )

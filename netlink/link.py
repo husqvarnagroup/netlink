@@ -1,22 +1,10 @@
 import logging
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict
 
-from netlink import NetlinkMessage
-
+from . import NetlinkMessage
+from .enums import IfrFlags, RtaType
 from .structs import IFINFOMSG, RTATTR
-
-IFLA_IFNAME = 3
-IFLA_LINK = 5
-IFLA_OPERSTATE = 16
-
-IFF_UP = 0x1
-IFF_LOOPBACK = 0x8
-IFF_RUNNING = 0x64
-
-AF_UNIX = AF_LOCAL = 1
-AF_INET = 2
-AF_NETLINK = 16
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +42,7 @@ class NetworkInterface:
 
     @property
     def name(self):
-        ifname = self.attributes.get(IFLA_IFNAME)
+        ifname = self.attributes.get(RtaType.IFLA_IFNAME)
         if ifname is None:
             logger.error(f"IFLA_IFNAME not found for index: {self.index}")
             return "unnamed"
@@ -65,10 +53,10 @@ class NetworkInterface:
         return ifname.decode()
 
     def is_loopback(self):
-        return bool(self.flags & IFF_LOOPBACK)
+        return bool(self.flags & IfrFlags.IFF_LOOPBACK)
 
     def is_up(self):
-        return bool(self.flags & IFF_UP)
+        return bool(self.flags & IfrFlags.IFF_UP)
 
     def is_running(self):
-        return bool(self.flags & IFF_LOOPBACK)
+        return bool(self.flags & IfrFlags.IFF_LOOPBACK)

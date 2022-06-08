@@ -1,59 +1,6 @@
-from enum import IntEnum
 from struct import Struct
 
 HEADER = Struct("IHHII")
 IFINFOMSG = Struct("BHiII")
 IFADDRMSG = Struct("BBBBI")
 RTATTR = Struct("HH")
-
-
-class TYPES(IntEnum):
-    BASE = 16
-    NEWLINK = 16
-    DELLINK = 17
-    GETLINK = 18
-    SETLINK = 19
-    NEWADDR = 20
-    DELADDR = 21
-    GETADDR = 22
-    NEWROUTE = 24
-    DELROUTE = 25
-    GETROUTE = 26
-    NEWNEIGH = 28
-    DELNEIGH = 29
-    GETNEIGH = 30
-    NEWRULE = 32
-    DELRULE = 33
-    GETRULE = 34
-    NEWQDISC = 36
-    DELQDISC = 37
-    GETQDISC = 38
-    NEWTCLASS = 40
-    DELTCLASS = 41
-    GETTCLASS = 42
-    NEWTFILTER = 44
-    DELTFILTER = 45
-    GETTFILTER = 46
-    NEWACTION = 48
-    DELACTION = 49
-    GETACTION = 50
-    NEWPREFIX = 52
-    GETMULTICAST = 58
-    GETANYCAST = 62
-    NEWNEIGHTBL = 64
-    GETNEIGHTBL = 66
-    SETNEIGHTBL = 67
-    NEWNDUSEROPT = 68
-    NEWADDRLABEL = 72
-    DELADDRLABEL = 73
-    GETADDRLABEL = 74
-    GETDCB = 78
-    SETDCB = 79
-    NEWNETCONF = 80
-    GETNETCONF = 82
-    NEWMDB = 84
-    DELMDB = 85
-    GETMDB = 86
-    NEWNSID = 88
-    DELNSID = 89
-    GETNSID = 90

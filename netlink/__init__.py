@@ -198,6 +198,9 @@ class NetlinkSocket:
 
         return self.packets.pop(sequence)
 
+    def close(self):
+        self.socket.close()
+
     async def noop(self):
         await self.request(NLMSG_NOOP)
 
@@ -214,3 +217,4 @@ async def connect(netlink_family, loop: Optional[asyncio.AbstractEventLoop] = No
         yield netlink_socket
         if not task.done:
             task.cancel()
+        netlink_socket.close()

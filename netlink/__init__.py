@@ -137,7 +137,7 @@ class NetlinkSocket:
             data = await self.loop.sock_recv(self.socket, 65536)
             while data:
                 length, type, flags, sequence, _ = HEADER.unpack_from(data)
-                payload = data[16:length]
+                payload = data[HEADER.size:length]
 
                 message = NetlinkMessage(type, flags, payload)
                 if type == NLMSG_ERROR or type == NLMSG_DONE:
@@ -174,7 +174,7 @@ class NetlinkSocket:
 
         flags |= NLM_F_REQUEST | NLM_F_ACK
 
-        length = 16 + len(payload)
+        length = HEADER.size + len(payload)
         header = HEADER.pack(length, type, flags, sequence, self.pid)
         await self.send(header + payload)
 

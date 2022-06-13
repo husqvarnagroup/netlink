@@ -80,3 +80,10 @@ class NetworkAddress:
 
     def is_ipv6(self):
         return self.family == AddressFamily.AF_INET6
+
+    def __repr__(self) -> str:
+        try:
+            ip = self.ipaddress
+        except ValueError:
+            ip = ""
+        return f"{self.__class__.__name__}(interface={self.interface_name}, ip={ip})"

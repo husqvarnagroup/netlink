@@ -5,9 +5,11 @@ import logging
 import os
 import socket
 import struct
+from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from netlink import attributes
+from netlink.enums import RtTypes
 from netlink.structs import NLMSGHDR
 
 logger = logging.getLogger(__name__)
@@ -93,11 +95,17 @@ ATTRIBUTES_ERROR = {
 }
 
 
+@dataclass
 class NetlinkMessage:
-    def __init__(self, type, flags, payload):
-        self.type: int = type
-        self.flags: int = flags
-        self.payload: bytes = payload
+    type: int
+    flags: int
+    payload: bytes
+    sequence: Optional[int] = None
+    pid: Optional[int] = None
+    data: Optional[bytes] = None
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(sequence={self.sequence}, type={self.type})"
 
 
 class NetlinkSocket:
@@ -136,23 +144,35 @@ class NetlinkSocket:
         while True:
             data = await self.loop.sock_recv(self.socket, 65536)
             while data:
-                length, type, flags, sequence, _ = NLMSGHDR.unpack_from(data)
+                length, type, flags, sequence, pid = NLMSGHDR.unpack_from(data)
                 payload = data[NLMSGHDR.size : length]
 
-                message = NetlinkMessage(type, flags, payload)
+                message = NetlinkMessage(type, flags, payload, sequence, pid, data)
                 if type == NLMSG_ERROR or type == NLMSG_DONE:
                     if sequence in self.pending:
                         self.replies[sequence] = message
                         self.pending.pop(sequence).set()
                     else:
-                        logger.warning("Received unexpected ack or error packet")
+                        pkg_type = ""
+                        if type == NLMSG_ERROR:
+                            pkg_type = "error"
+                        elif type == NLMSG_DONE:
+                            pkg_type = "ack"
+                        logger.warning(
+                            f"Received unexpected {pkg_type} packet with sequence {sequence}"
+                        )
                 elif sequence == 0:
                     await self.package_queue.put(message)
                 elif sequence in self.packets:
                     self.packets[sequence].append(message)
                 else:
+                    await self.package_queue.put(message)
+                    try:
+                        type_str = f"{RtTypes(type).name}({type})"
+                    except ValueError:
+                        type_str = f"{type}"
                     logger.warning(
-                        f"Received packet with unexpected sequence: {sequence}"
+                        f"Received packet with unexpected sequence: {sequence} [type: {type_str}]"
                     )
 
                 data = data[length:]

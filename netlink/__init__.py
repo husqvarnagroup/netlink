@@ -8,7 +8,7 @@ import struct
 from typing import Dict, List, Optional
 
 from netlink import attributes
-from netlink.structs import HEADER
+from netlink.structs import NLMSGHDR
 
 logger = logging.getLogger(__name__)
 
@@ -136,8 +136,8 @@ class NetlinkSocket:
         while True:
             data = await self.loop.sock_recv(self.socket, 65536)
             while data:
-                length, type, flags, sequence, _ = HEADER.unpack_from(data)
-                payload = data[HEADER.size : length]
+                length, type, flags, sequence, _ = NLMSGHDR.unpack_from(data)
+                payload = data[NLMSGHDR.size : length]
 
                 message = NetlinkMessage(type, flags, payload)
                 if type == NLMSG_ERROR or type == NLMSG_DONE:
@@ -179,8 +179,8 @@ class NetlinkSocket:
 
         flags |= NLM_F_REQUEST | NLM_F_ACK
 
-        length = HEADER.size + len(payload)
-        header = HEADER.pack(length, type, flags, sequence, self.pid)
+        length = NLMSGHDR.size + len(payload)
+        header = NLMSGHDR.pack(length, type, flags, sequence, self.pid)
         await self.send(header + payload)
 
         try:

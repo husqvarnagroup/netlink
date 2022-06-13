@@ -137,7 +137,7 @@ class NetlinkSocket:
             data = await self.loop.sock_recv(self.socket, 65536)
             while data:
                 length, type, flags, sequence, _ = HEADER.unpack_from(data)
-                payload = data[HEADER.size:length]
+                payload = data[HEADER.size : length]
 
                 message = NetlinkMessage(type, flags, payload)
                 if type == NLMSG_ERROR or type == NLMSG_DONE:
@@ -162,6 +162,11 @@ class NetlinkSocket:
 
     async def receive(self):
         return await self.package_queue.get()
+
+    async def receive_iter(self):
+        while True:
+            msg = await self.receive()
+            yield msg
 
     async def request(
         self, type: int, payload=b"", flags=0, timeout=3
@@ -206,12 +211,14 @@ class NetlinkSocket:
 
 
 @contextlib.asynccontextmanager
-async def connect(netlink_family, loop: Optional[asyncio.AbstractEventLoop] = None):
+async def connect(
+    netlink_family, groups: int = 0, loop: Optional[asyncio.AbstractEventLoop] = None
+):
     with socket.socket(socket.AF_NETLINK, socket.SOCK_DGRAM, netlink_family) as sock:
         sock.setsockopt(SOL_NETLINK, NETLINK_CAP_ACK, True)
         sock.setsockopt(SOL_NETLINK, NETLINK_EXT_ACK, True)
 
-        sock.bind((os.getpid(), 0))
+        sock.bind((os.getpid(), groups))
         netlink_socket = NetlinkSocket(sock, loop)
         task = asyncio.create_task(netlink_socket.start())
         yield netlink_socket

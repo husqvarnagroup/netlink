@@ -1,5 +1,4 @@
 import logging
-from dataclasses import dataclass
 from typing import Dict
 
 from . import NetlinkMessage
@@ -9,11 +8,15 @@ from .structs import IFINFOMSG, RTATTR
 logger = logging.getLogger(__name__)
 
 
-@dataclass
 class NetworkInterface:
     index: int
     flags: bytes
     attributes: Dict[int, bytes]
+
+    def __init__(self, index: int, flags: bytes, attributes: Dict[int, bytes]) -> None:
+        self.index = index
+        self.flags = flags
+        self.attributes = attributes
 
     @classmethod
     def from_message(cls, message: NetlinkMessage) -> "NetworkInterface":

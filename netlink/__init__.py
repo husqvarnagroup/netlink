@@ -5,7 +5,6 @@ import logging
 import os
 import socket
 import struct
-from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from netlink import attributes
@@ -95,7 +94,6 @@ ATTRIBUTES_ERROR = {
 }
 
 
-@dataclass
 class NetlinkMessage:
     type: int
     flags: int
@@ -103,6 +101,22 @@ class NetlinkMessage:
     sequence: Optional[int] = None
     pid: Optional[int] = None
     data: Optional[bytes] = None
+
+    def __init__(
+        self,
+        type: int,
+        flags: int,
+        payload: bytes,
+        sequence: Optional[int] = None,
+        pid: Optional[int] = None,
+        data: Optional[bytes] = None,
+    ) -> None:
+        self.type = type
+        self.flags = flags
+        self.payload = payload
+        self.sequence = sequence
+        self.pid = pid
+        self.data = data
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(sequence={self.sequence}, type={self.type})"

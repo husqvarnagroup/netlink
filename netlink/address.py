@@ -1,6 +1,5 @@
 import logging
 import socket
-from dataclasses import dataclass
 from typing import Dict, Optional
 
 from . import NetlinkMessage
@@ -10,7 +9,6 @@ from .structs import IFADDRMSG, RTATTR
 logger = logging.getLogger(__name__)
 
 
-@dataclass
 class NetworkAddress:
     index: int
     prefixlen: int
@@ -19,6 +17,23 @@ class NetworkAddress:
     scope: int
     attributes: Dict[int, bytes]
     message: NetlinkMessage
+
+    def __init__(
+        self,
+        index: int,
+        prefixlen: int,
+        family: int,
+        flags: bytes,
+        scope: int,
+        attributes: Dict[int, bytes],
+        message: NetlinkMessage,
+    ) -> None:
+        self.index = index
+        self.prefixlen = prefixlen
+        self.family = family
+        self.flags = flags
+        self.scope = scope
+        self.attributes = attributes
 
     @classmethod
     def from_message(cls, message: NetlinkMessage) -> "NetworkAddress":
